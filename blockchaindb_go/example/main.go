@@ -2,14 +2,14 @@ package main
 
 import (
 	"encoding/json"
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"net"
-	"flag"
-	
-	pb "../protobuf/go"
-	"../hash"
+
+	"bitcoin-from-scratch/blockchaindb_go/hash"
+	pb "bitcoin-from-scratch/blockchaindb_go/protobuf/go"
 
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"

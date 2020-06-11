@@ -9,7 +9,7 @@ import (
 	"log"
 	"math/rand"
 
-	pb "../protobuf/go"
+	pb "bitcoin-from-scratch/blockchaindb_go/protobuf/go"
 
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
