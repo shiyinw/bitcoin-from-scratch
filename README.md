@@ -1,5 +1,5 @@
 # Project 4: Bitcoin
-**Shiyin Wang, Yixiang Zhang, Rui Lu**  (2020 Spring Tsinghua Operating Systems Group Project)
+**Shiyin Wang** (2020 Spring Tsinghua Operating Systems Group Project)
 
 [GitHub](https://github.com/shiyinw/bitcoin-from-scratch/) https://github.com/shiyinw/bitcoin-from-scratch/
 
@@ -47,10 +47,11 @@ Similar with the project 3, whenever we want to reduce the amount of money from 
 ```go
 func (s *server) Transfer(ctx context.Context, in *pb.TransferRequest) (*pb.BooleanResponse, error) {
   ......
-	if data[in.FromID]>=in.Value{
+	if data[in.FromID]>=in.Value && in.FromID!=in.ToID{
 		loglen++
 		data[in.FromID] -= in.Value
 		data[in.ToID] += in.Value
+    data[file.MinerID] += in.MiningFee
 		return &pb.BooleanResponse{Success: true}, nil
 	}else{
 		return &pb.BooleanResponse{Success: false}, errors.New("Transaction "+string(in.Value)+" failed with: insufficient balance")
@@ -114,7 +115,7 @@ Our test covers several aspects of this system.
 | Script    | \# Lines | Features                                                     |
 | --------- | -------- | ------------------------------------------------------------ |
 | test_0.go |          | server start and shutdown, client initialization with 1000 balance |
-| test_1.go |          | transfers within a server                                    |
+| test_1.go |          | broadcase transactions to other servers according to `config.json` |
 | test_2.go |          | the transfers in a server is acknowledged by other servers   |
 |           |          |                                                              |
 |           |          |                                                              |

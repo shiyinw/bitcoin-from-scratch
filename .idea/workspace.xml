@@ -11,17 +11,18 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0af5353a-3758-4061-a60f-e4bb90c356b9" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/bitcoin-from-scratch.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/bitcoin-from-scratch.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/1.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/example/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/example/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/test_run.sh" beforeDir="false" afterPath="$PROJECT_DIR$/example/test_run.sh" afterDir="false" />
-    </list>
-    <list id="39bd974f-9d27-47ec-964e-5266ece77961" name="Fix bug: transport is closing" comment="">
-      <change beforePath="$PROJECT_DIR$/compile.sh" beforeDir="false" afterPath="$PROJECT_DIR$/compile.sh" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/protobuf/go/db.pb.go" beforeDir="false" afterPath="$PROJECT_DIR$/protobuf/go/db.pb.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/protobuf/db.proto" beforeDir="false" afterPath="$PROJECT_DIR$/protobuf/db.proto" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server/main" beforeDir="false" afterPath="$PROJECT_DIR$/server/main" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/config.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/run.sh" beforeDir="false" afterPath="$PROJECT_DIR$/test/run.sh" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/test/test_1.go" beforeDir="false" afterPath="$PROJECT_DIR$/test/test_1.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tmp/server03/1.json" beforeDir="false" />
     </list>
+    <list id="39bd974f-9d27-47ec-964e-5266ece77961" name="Fix bug: transport is closing" comment="" />
     <list id="37ac5128-89e3-42e9-ba2e-6c6fdf6144ab" name="Revert &quot;Init with skeleton&quot;" comment="Revert &quot;Init with skeleton&quot;&#10;&#10;This reverts commit cc4e49a4" />
     <list id="5adb4c1a-c7f7-4d4a-a79d-b55989b53d03" name="Revert &quot;Init with skeleton&quot;-2" comment="Revert &quot;Init with skeleton&quot;&#10;&#10;This reverts commit 392960b0" />
     <option name="SHOW_DIALOG" value="false" />

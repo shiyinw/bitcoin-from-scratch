@@ -139,10 +139,10 @@ func main() {
 			uid := id(i)
 			r, err := client2.Get(ctx, &pb.GetRequest{UserID: uid})
 			if err!=nil{
-				//log.Fatalf("Client.Get: %v", err)
+				log.Fatalf("Client.Get: %v", err)
 			}
 			if (i>0 && i<N && r.Value != 1000)||(i==0 && r.Value!=900)||(i==N && r.Value!=1100){
-				//log.Fatalf("Client.Get false return value (user %d = %d)", i, r.Value)
+				log.Fatalf("Client.Get false return value (user %d = %d)", i, r.Value)
 			}
 			wg.Done()
 		}(i)

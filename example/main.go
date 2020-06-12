@@ -26,6 +26,10 @@ var data = make(map[string]int32)
 var loglen int32
 var fileidx int64 = 1 // store the ledger in [fileidx].json
 var dataDir string // store the blocks
+var server_list []string
+var neighbors_client = make(map[string]pb.BlockChainMinerClient)
+var neighbors_conn = make(map[string]grpc.ClientConn)
+var address string
 
 // no two contradictory transactions
 var mutex = mapmutex.NewMapMutex()
@@ -84,10 +88,11 @@ func (s *server) Transfer(ctx context.Context, in *pb.Transaction) (*pb.BooleanR
 		defer mutex.Unlock(in.FromID)
 		// Integrity constrain
 		var userid = in.UUID
-		if data[in.FromID] >= in.Value {
+		if data[in.FromID] >= in.Value && in.FromID!=in.ToID{
 			loglen++
 			data[in.FromID] -= in.Value
 			data[in.ToID] += in.Value
+			data[file.MinerID] += in.MiningFee
 			// Json I/O
 			entry := transactionio{"TRANSFER", in.FromID, in.ToID, in.Value, in.MiningFee, in.UUID}
 			file.Transactions = append(file.Transactions, entry)
@@ -104,6 +109,10 @@ func (s *server) Transfer(ctx context.Context, in *pb.Transaction) (*pb.BooleanR
 				fileidx++
 				file.BlockID = fileidx
 				file.Transactions = []transactionio{}
+			}
+			if in.Type == 5{  // TRANSFER
+				in.Type = 4
+				s.PushTransaction(ctx, in)
 			}
 			return &pb.BooleanResponse{Success: true}, nil
 		} else {
@@ -127,6 +136,16 @@ func (s *server) PushBlock(ctx context.Context, in *pb.JsonBlockString) (*pb.Nul
 	return &pb.Null{}, nil
 }
 func (s *server) PushTransaction(ctx context.Context, in *pb.Transaction) (*pb.Null, error) {
+	for _, addr := range server_list{
+		log.Print(addr)
+		conn, err := grpc.Dial(addr, grpc.WithInsecure())
+		defer conn.Close()
+		if err == nil {
+			client := pb.NewBlockChainMinerClient(conn)
+			client.Transfer(ctx, in)
+			log.Printf("PushTransaction %s -> %s", address, addr)
+		}
+	}
 	return &pb.Null{}, nil
 }
 
@@ -144,7 +163,7 @@ func main() {
 	
 
 	// Read config
-	address, outputDir := func() (string, string) {
+	address, dataDir = func() (string, string) {
 		conf, err := ioutil.ReadFile("config.json")
 		if err != nil {
 			panic(err)
@@ -154,10 +173,17 @@ func main() {
 		if err != nil {
 			panic(err)
 		}
+		for i:=1;i<=int(dat["nservers"].(float64));i++{
+			if i!=*id{
+				curItem := dat[fmt.Sprintf("%d", i)].(map[string]interface{})
+				curAddr := fmt.Sprintf("%s:%s", curItem["ip"], curItem["port"])
+				server_list = append(server_list, curAddr)
+			}
+		}
+		log.Print(server_list)
 		dat = dat[IDstr].(map[string]interface{}) // should be dat[myNum] in the future
 		return fmt.Sprintf("%s:%s", dat["ip"], dat["port"]), fmt.Sprintf("%s",dat["dataDir"])
 	}()
-	dataDir = outputDir
 	//Different from Project 3, when a server crashes, it loses all data on disk. The server should recover its blocks by replicating from another server.
 	os.RemoveAll(dataDir)
 	os.Mkdir(dataDir, 0777)

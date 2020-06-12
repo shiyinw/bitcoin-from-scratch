@@ -19,6 +19,7 @@ echo "Tests start..."
 
 I=0
 for filename in test/test*.go; do
+  echo "===================="
 	echo "Running " $filename
 	TESTS[$I]=$filename
 	go run $filename

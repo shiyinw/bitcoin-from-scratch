@@ -8,7 +8,7 @@ package blockdb;
 
 // Interface exported by the server.
 service BlockChainMiner {
-    // Return UserID's Balance on the Chain, after considering the latest valid block. Pending transactions have no effect on Get()
+	// Return UserID's Balance on the Chain, after considering the latest valid block. Pending transactions have no effect on Get()
 	rpc Get(GetRequest) returns (GetResponse) {}
 
 	// Receive and Broadcast Transaction: balance[FromID]-=Value, balance[ToID]+=(Value-MiningFee), balance[MinerID]+=MiningFee
@@ -68,6 +68,7 @@ message Null {}
 message Transaction {
 	enum Types {
 		UNKNOWN = 0;
+		BROADCAST = 4;
 		TRANSFER = 5;
 	}
 	Types Type = 1;
