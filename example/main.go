@@ -47,7 +47,10 @@ type fileio struct{
 	MinerID string
 	Nonce string `default:"00000000"`
 }
-var file fileio = fileio{fileidx, "00000000", []transactionio{}, "Server","00000000"}
+
+var prevHash string = "0000000000000000000000000000000000000000000000000000000000000000"
+var nonce string = "0000000000000000000000000000000000000000000000000000000000000000"
+var file fileio = fileio{fileidx, prevHash, []transactionio{}, "Server",nonce}
 
 
 
@@ -134,12 +137,14 @@ func main() {
 	flag.Parse()
 	IDstr:=fmt.Sprintf("%d",*id)
 
-	_=fmt.Sprintf("Server%02d",*id) //MinerID=
+	MinerID := fmt.Sprintf("Server%02d",*id) //MinerID=
 	_=hash.GetHashString
+
+	file = fileio{fileidx, prevHash, []transactionio{}, MinerID,nonce}
 	
 
 	// Read config
-	address, dataDir := func() (string, string) {
+	address, outputDir := func() (string, string) {
 		conf, err := ioutil.ReadFile("config.json")
 		if err != nil {
 			panic(err)
@@ -152,6 +157,7 @@ func main() {
 		dat = dat[IDstr].(map[string]interface{}) // should be dat[myNum] in the future
 		return fmt.Sprintf("%s:%s", dat["ip"], dat["port"]), fmt.Sprintf("%s",dat["dataDir"])
 	}()
+	dataDir = outputDir
 	//Different from Project 3, when a server crashes, it loses all data on disk. The server should recover its blocks by replicating from another server.
 	os.RemoveAll(dataDir)
 	os.Mkdir(dataDir, 0777)

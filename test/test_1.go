@@ -95,7 +95,7 @@ func main() {
 	var wg sync.WaitGroup
 	fmt.Println("Part 1: Make 100 transfer from i to i+1 in server 1")
 
-	var N int = 1
+	var N int = 10
 	for i := 0; i < N; i++ {
 		wg.Add(1)
 		go func(i int) {
@@ -107,11 +107,12 @@ func main() {
 			} else {
 				log.Printf("TRANSFER(%s -> %s) Return: %s", id(i), id(i+1), r)
 			}
-			time.Sleep(time.Millisecond * 1) // Otherwise, "transport is closing"
+			//time.Sleep(time.Millisecond * 100)
 			wg.Done()
 		}(i)
+		wg.Wait() // Otherwise, "transport is closing"
 	}
-	wg.Wait()
+
 
 	// Check Server 1
 	for i := 0; i < N; i++ {
@@ -127,8 +128,9 @@ func main() {
 			}
 			wg.Done()
 		}(i)
+		wg.Wait() // Otherwise, "transport is closing"
 	}
-	wg.Wait()
+
 
 	// Check Server 2
 	for i := 0; i < N; i++ {
@@ -144,8 +146,9 @@ func main() {
 			}
 			wg.Done()
 		}(i)
+		wg.Wait()
 	}
-	wg.Wait()
+
 
 	log.Println("Part 1 Success.")
 }

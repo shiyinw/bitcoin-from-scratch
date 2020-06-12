@@ -15,6 +15,13 @@ if [ ! -f "config.json" ]; then
 	exit -1
 fi
 
+# Initialize the ports
+lsof -n -i4TCP:50051 | grep LISTEN | awk '{ print $2 }' | xargs kill
+lsof -n -i4TCP:50052 | grep LISTEN | awk '{ print $2 }' | xargs kill
+lsof -n -i4TCP:50053 | grep LISTEN | awk '{ print $2 }' | xargs kill
+lsof -n -i4TCP:50054 | grep LISTEN | awk '{ print $2 }' | xargs kill
+lsof -n -i4TCP:50055 | grep LISTEN | awk '{ print $2 }' | xargs kill
+
 echo "Testrun starting..."
 
 ./start.sh &

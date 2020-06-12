@@ -1,1 +1,0 @@
-{"BlockID":1,"PrevHash":"00000000","Transactions":[{"Type":"TRANSFER","FromID":"T1U00000","ToID":"T1U00001","Value":100,"MiningFee":3,"UUID":"52fdfc072182454f963f5f0f9a621d72"}],"MinerID":"Server","Nonce":"00000000"}
