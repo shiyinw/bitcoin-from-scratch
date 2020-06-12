@@ -2,18 +2,13 @@
 {
 	"1":{
 		"ip":"127.0.0.1",
-		"port":"50051",
-		"dataDir":"/tmp/server01/"
+		"port":"50053",
+		"dataDir":"tmp/server03/"
 	},
 	"2":{
 		"ip":"127.0.0.1",
-		"port":"50052",
-		"dataDir":"/tmp/server02/"
+		"port":"50054",
+		"dataDir":"tmp/server04/"
 	},
-	"3":{
-		"ip":"127.0.0.1",
-		"port":"50053",
-		"dataDir":"/tmp/server03/"
-	},
-	"nservers":3
+	"nservers":2
 }

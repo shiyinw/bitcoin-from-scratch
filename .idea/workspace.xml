@@ -11,11 +11,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0af5353a-3758-4061-a60f-e4bb90c356b9" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/test/config.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test/run.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test/test_0.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test/test_1.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blockchaindb_go/example/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/blockchaindb_go/example/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blockchaindb_go/server/main" beforeDir="false" afterPath="$PROJECT_DIR$/blockchaindb_go/server/main" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/compile.sh" beforeDir="false" afterPath="$PROJECT_DIR$/compile.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config.json" beforeDir="false" afterPath="$PROJECT_DIR$/config.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/example/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/example/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/main" beforeDir="false" afterPath="$PROJECT_DIR$/server/main" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/server/main.go" afterDir="false" />
     </list>
     <list id="37ac5128-89e3-42e9-ba2e-6c6fdf6144ab" name="Revert &quot;Init with skeleton&quot;" comment="Revert &quot;Init with skeleton&quot;&#10;&#10;This reverts commit cc4e49a4" />
     <option name="SHOW_DIALOG" value="false" />
@@ -23,26 +28,48 @@
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Go File" />
+      </list>
+    </option>
+  </component>
   <component name="GOROOT" path="/usr/local/go" />
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="RESET_MODE" value="HARD" />
   </component>
   <component name="GoLibraries">
     <option name="indexEntireGoPath" value="false" />
   </component>
   <component name="ProjectId" id="1dBA6xUO2Ct1tTcnjb0I6uFFUDV" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
+    <property name="DefaultGoTemplateProperty" value="Go File" />
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="com.intellij.ide.scratch.LRUPopupBuilder$1/New Scratch File" value="Shell Script" />
     <property name="go.import.settings.migrated" value="true" />
     <property name="go.sdk.automatically.set" value="true" />
     <property name="go.tried.to.enable.integration.vgo.integrator" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/test" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/test" />
+      <recent name="$PROJECT_DIR$/test/1" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/test" />
+      <recent name="$PROJECT_DIR$/example_test" />
+      <recent name="$PROJECT_DIR$/example_test/0" />
+    </key>
   </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
@@ -56,6 +83,17 @@
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="2" />
+  </component>
+  <component name="Vcs.Log.History.Properties">
+    <option name="SHOW_OTHER_BRANCHES" value="true" />
+    <option name="COLUMN_ORDER">
+      <list>
+        <option value="0" />
+        <option value="2" />
+        <option value="3" />
+        <option value="1" />
+      </list>
+    </option>
   </component>
   <component name="Vcs.Log.Tabs.Properties">
     <option name="TAB_STATES">
@@ -75,18 +113,25 @@
     </option>
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Add proj-3 code; Format" />
+  </component>
   <component name="VgoProject">
     <integration-enabled>true</integration-enabled>
   </component>
   <component name="WindowStateProjectService">
-    <state x="717" y="349" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1591888062364">
+    <state x="717" y="349" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1591927434386">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state x="717" y="349" key="#com.intellij.fileTypes.FileTypeChooser/0.0.1920.1080@0.0.1920.1080" timestamp="1591888062364" />
-    <state x="100" y="100" width="1720" height="880" maximized="true" key="DiffContextDialog" timestamp="1591894799270">
+    <state x="717" y="349" key="#com.intellij.fileTypes.FileTypeChooser/0.0.1920.1080@0.0.1920.1080" timestamp="1591927434386" />
+    <state x="100" y="100" width="1720" height="880" maximized="true" key="DiffContextDialog" timestamp="1591945766683">
       <screen x="0" y="23" width="1920" height="978" />
     </state>
-    <state x="100" y="100" width="1720" height="880" maximized="true" key="DiffContextDialog/0.0.1920.1080@0.0.1920.1080" timestamp="1591892264355" />
+    <state x="100" y="100" width="1720" height="880" maximized="true" key="DiffContextDialog/0.0.1920.1080@0.0.1920.1080" timestamp="1591945578692" />
+    <state x="811" y="451" key="GitRewordDialog" timestamp="1591895583440">
+      <screen x="0" y="0" width="1920" height="1080" />
+    </state>
+    <state x="811" y="451" key="GitRewordDialog/0.0.1920.1080@0.0.1920.1080" timestamp="1591895583440" />
     <state x="844" y="413" width="231" height="270" key="MultipleFileMergeDialog" timestamp="1591890440560">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
@@ -99,9 +144,9 @@
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
     <state x="813" y="461" key="VCS.ChangelistChooser/0.0.1920.1080@0.0.1920.1080" timestamp="1591890412957" />
-    <state x="667" y="295" width="586" height="490" key="find.popup" timestamp="1591890239343">
+    <state x="667" y="295" width="586" height="490" key="find.popup" timestamp="1591900349150">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state x="667" y="295" width="586" height="490" key="find.popup/0.0.1920.1080@0.0.1920.1080" timestamp="1591890239343" />
+    <state x="667" y="295" width="586" height="490" key="find.popup/0.0.1920.1080@0.0.1920.1080" timestamp="1591900349150" />
   </component>
 </project>

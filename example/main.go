@@ -19,7 +19,7 @@ import (
 	"google.golang.org/grpc/reflection"
 )
 
-const maxBlockSize = 3 // 50
+const maxBlockSize = 50
 type Dictionary map[string]interface{}
 
 var data = make(map[string]int32)
@@ -42,7 +42,7 @@ type transactionio struct{
 
 type fileio struct{
 	BlockID int64
-	PrevHash string `default:"00000000"`
+	PrevHash string `default:"0000000000000000000000000000000000000000000000000000000000000000"`
 	Transactions []transactionio
 	MinerID string
 	Nonce string `default:"00000000"`
@@ -152,38 +152,11 @@ func main() {
 		dat = dat[IDstr].(map[string]interface{}) // should be dat[myNum] in the future
 		return fmt.Sprintf("%s:%s", dat["ip"], dat["port"]), fmt.Sprintf("%s",dat["dataDir"])
 	}()
-	// Unused variable
-	if _, err := os.Stat(dataDir); os.IsNotExist(err) {
-		os.Mkdir(dataDir, 0777)
-	}
-	// Recover
-	log.Print("Retrieving data from blocks......")
-	files, err := ioutil.ReadDir(dataDir)
-	if err != nil {
-		log.Fatal(err)
-	}
-	for i := 1; i <= len(files); i++ {
-		fileidx = int64(i)
-		var cached_string, _ = ioutil.ReadFile(dataDir + strconv.Itoa(i) + ".json")
-		json.Unmarshal(cached_string, &file)
-		for _, tran := range file.Transactions {
-			loglen++
-			switch tran.Type {
-			default:
-				log.Fatal("Unknown operation.")
-			case "TRANSFER":
-				data[tran.FromID] -= tran.Value
-				data[tran.ToID] += tran.Value
-			}
-		}
-	}
-	if loglen > 0 && loglen % maxBlockSize == 0{
-		loglen = 0
-		fileidx++
-		file.BlockID = fileidx
-		file.Transactions = []transactionio{}
-	}
-	log.Print(loglen)
+	//Different from Project 3, when a server crashes, it loses all data on disk. The server should recover its blocks by replicating from another server.
+	os.RemoveAll(dataDir)
+	os.Mkdir(dataDir, 0777)
+	log.Print(address)
+	log.Print(dataDir)
 
 	// Bind to port
 	lis, err := net.Listen("tcp", address)
