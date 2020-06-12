@@ -4,6 +4,7 @@ package main
 
 import (
 	pb "blockchaindb_go/protobuf/go"
+	"encoding/json"
 	"fmt"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
@@ -11,6 +12,7 @@ import (
 	"log"
 	"math/rand"
 	"os/exec"
+	"reflect"
 	"sync"
 	"time"
 )
@@ -50,6 +52,22 @@ func UUID128bit() string {
 	return fmt.Sprintf("%x",u)
 }
 
+type transactionio struct{
+	Type string
+	FromID string
+	ToID string
+	Value int32
+	MiningFee int32
+	UUID string
+}
+
+type fileio struct{
+	BlockID int64
+	PrevHash string `default:"0000000000000000000000000000000000000000000000000000000000000000"`
+	Transactions []transactionio
+	MinerID string
+	Nonce string `default:"00000000"`
+}
 
 func main() {
 
@@ -131,7 +149,6 @@ func main() {
 		wg.Wait() // Otherwise, "transport is closing"
 	}
 
-
 	// Check Server 2
 	for i := 0; i < N; i++ {
 		wg.Add(1)
@@ -149,6 +166,31 @@ func main() {
 		wg.Wait()
 	}
 
+	log1, _ := ioutil.ReadFile("./tmp/server03/1.json")
+	log2, _ := ioutil.ReadFile("./tmp/server04/1.json")
+
+	var o1 fileio
+	var o2 fileio
+
+	var err error
+	err = json.Unmarshal(log1, &o1)
+	if err != nil {
+		log.Fatalf("Error mashalling string 1 :: %s", err.Error())
+	}
+	err = json.Unmarshal(log2, &o2)
+	if err != nil {
+		log.Fatalf("Error mashalling string 2 :: %s", err.Error())
+	}
+
+	// except the MinerID are different
+	o1.MinerID = ""
+	o2.MinerID = ""
+
+	if !reflect.DeepEqual(o1, o2){
+		log.Fatal("JSON logs missing/mismatch")
+	}else{
+		log.Print("JSON logs match.")
+	}
 
 	log.Println("Part 1 Success.")
 }

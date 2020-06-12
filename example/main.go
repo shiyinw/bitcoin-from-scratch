@@ -44,19 +44,41 @@ type transactionio struct{
 	UUID string
 }
 
+// store the local data as a tree
+type TreeNode struct {
+	Prev  *TreeNode
+	Depth int //fileidx
+	Cache map[string]int32 // data [id]->balance
+	FileIO fileio // Block content
+	Hash string // 64-digit hash
+	Next []*TreeNode // bidirectional
+}
+
+
 type fileio struct{
 	BlockID int64
 	PrevHash string `default:"0000000000000000000000000000000000000000000000000000000000000000"`
 	Transactions []transactionio
 	MinerID string
 	Nonce string `default:"00000000"`
-}
+} //redefine for the pb.Block has nuisance attributes
 
 var prevHash string = "0000000000000000000000000000000000000000000000000000000000000000"
-var nonce string = "0000000000000000000000000000000000000000000000000000000000000000"
+var nonce string = "00000000"
 var file fileio = fileio{fileidx, prevHash, []transactionio{}, "Server",nonce}
+var mineflag = false
 
-
+func Mine(filecontent fileio, start int)(bool, fileio){
+	for mineflag && len(filecontent.Transactions)>0{
+		filecontent.Nonce = fmt.Sprintf("%08d", start)
+		curStr := fmt.Sprintf("%v", filecontent)
+		if hash.CheckHash(curStr) {
+			return true, filecontent
+		}
+		start++
+	}
+	return false, filecontent
+}
 
 type server struct{}
 // Database Interface 
@@ -112,7 +134,12 @@ func (s *server) Transfer(ctx context.Context, in *pb.Transaction) (*pb.BooleanR
 			}
 			if in.Type == 5{  // TRANSFER
 				in.Type = 4
-				s.PushTransaction(ctx, in)
+				count, err := s.PushTransaction(ctx, in)
+				if err==nil && count.Number>=int32(1){
+					return &pb.BooleanResponse{Success: true}, nil
+				}else{
+					return &pb.BooleanResponse{Success: false}, nil
+				}
 			}
 			return &pb.BooleanResponse{Success: true}, nil
 		} else {
@@ -135,7 +162,8 @@ func (s *server) GetBlock(ctx context.Context, in *pb.GetBlockRequest) (*pb.Json
 func (s *server) PushBlock(ctx context.Context, in *pb.JsonBlockString) (*pb.Null, error) {
 	return &pb.Null{}, nil
 }
-func (s *server) PushTransaction(ctx context.Context, in *pb.Transaction) (*pb.Null, error) {
+func (s *server) PushTransaction(ctx context.Context, in *pb.Transaction) (*pb.IntegerResponse, error) {
+	var count int32
 	for _, addr := range server_list{
 		log.Print(addr)
 		conn, err := grpc.Dial(addr, grpc.WithInsecure())
@@ -144,9 +172,10 @@ func (s *server) PushTransaction(ctx context.Context, in *pb.Transaction) (*pb.N
 			client := pb.NewBlockChainMinerClient(conn)
 			client.Transfer(ctx, in)
 			log.Printf("PushTransaction %s -> %s", address, addr)
+			count++
 		}
 	}
-	return &pb.Null{}, nil
+	return &pb.IntegerResponse{Number:count}, nil
 }
 
 var id=flag.Int("id",1,"Server's ID, 1<=ID<=NServers")

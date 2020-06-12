@@ -28,8 +28,12 @@ service BlockChainMiner {
 	rpc PushBlock(JsonBlockString) returns (Null) {}
 
 	// Send a transaction to another server
-	rpc PushTransaction(Transaction) returns (Null) {}
+	rpc PushTransaction(Transaction) returns (IntegerResponse) {}
 
+}
+
+message IntegerResponse{
+	int32 Number = 1;
 }
 
 message GetBlockRequest {
