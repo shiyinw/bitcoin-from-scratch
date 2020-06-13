@@ -1,0 +1,1 @@
+{"BlockID":6,"PrevHash":"0000073a023db8e3d4bd71e69543ef014ef498a49bab6efb6a96077aa9e2d4be","Transactions":[{"Type":5,"FromID":"USER0000","ToID":"USER0099","Value":5,"MiningFee":1,"UUID":"a6df58d213a843369b91b8b9299016e3"},{"Type":5,"FromID":"USER0001","ToID":"USER0099","Value":5,"MiningFee":1,"UUID":"28a2e54c7cf34baab19f6aea5f095a11"}],"MinerID":"Server01","Nonce":"00380352"}

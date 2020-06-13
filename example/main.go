@@ -9,6 +9,7 @@ import (
 	"net"
 	"os"
 	"strconv"
+	"sync"
 
 	"blockchaindb_go/hash"
 	pb "blockchaindb_go/protobuf/go"
@@ -19,17 +20,20 @@ import (
 	"google.golang.org/grpc/reflection"
 )
 
+
 const maxBlockSize = 50
 type Dictionary map[string]interface{}
 
 var data = make(map[string]int32)
 var loglen int32
-var fileidx int64 = 1 // store the ledger in [fileidx].json
+var fileidx int32 = 1 // store the ledger in [fileidx].json
 var dataDir string // store the blocks
 var server_list []string
 var neighbors_client = make(map[string]pb.BlockChainMinerClient)
 var neighbors_conn = make(map[string]grpc.ClientConn)
 var address string
+
+var blockHashTable = make(map[string]pb.Block) //store the hash table
 
 // no two contradictory transactions
 var mutex = mapmutex.NewMapMutex()
@@ -44,41 +48,17 @@ type transactionio struct{
 	UUID string
 }
 
-// store the local data as a tree
-type TreeNode struct {
-	Prev  *TreeNode
-	Depth int //fileidx
-	Cache map[string]int32 // data [id]->balance
-	FileIO fileio // Block content
-	Hash string // 64-digit hash
-	Next []*TreeNode // bidirectional
-}
-
-
-type fileio struct{
-	BlockID int64
-	PrevHash string `default:"0000000000000000000000000000000000000000000000000000000000000000"`
-	Transactions []transactionio
-	MinerID string
-	Nonce string `default:"00000000"`
-} //redefine for the pb.Block has nuisance attributes
-
 var prevHash string = "0000000000000000000000000000000000000000000000000000000000000000"
 var nonce string = "00000000"
-var file fileio = fileio{fileidx, prevHash, []transactionio{}, "Server",nonce}
-var mineflag = false
 
-func Mine(filecontent fileio, start int)(bool, fileio){
-	for mineflag && len(filecontent.Transactions)>0{
-		filecontent.Nonce = fmt.Sprintf("%08d", start)
-		curStr := fmt.Sprintf("%v", filecontent)
-		if hash.CheckHash(curStr) {
-			return true, filecontent
-		}
-		start++
-	}
-	return false, filecontent
-}
+var m = &sync.Mutex{}
+var c = sync.NewCond(m)
+var curHash string
+var chanBlock = make(chan *pb.Block)
+var curBlock pb.Block = pb.Block{BlockID: fileidx, PrevHash: prevHash, Transactions: []*pb.Transaction{}, MinerID: "", Nonce: nonce}
+
+
+
 
 type server struct{}
 // Database Interface 
@@ -90,6 +70,56 @@ func (s *server) Get(ctx context.Context, in *pb.GetRequest) (*pb.GetResponse, e
 	}
 	return &pb.GetResponse{Value: data[in.UserID]}, nil
 }
+
+var updateBlock bool = true
+
+func Mine()() {
+	log.Print("Start Mining")
+	defer log.Print("Stop Mining")
+	var start int = 0
+	var block pb.Block
+	var data []byte
+	for{
+		if updateBlock{
+			block = curBlock
+			updateBlock = false
+			start = 0
+			data, _ = json.Marshal(block)
+		}
+		if len(block.Transactions)<=0{
+			continue
+		}
+		d, _ := json.Marshal(fmt.Sprintf("%08d", start))
+		// can't assign to slice, so we have to enumerate one-by-one
+		data[len(data)-10] = d[1]
+		data[len(data)-9] = d[2]
+		data[len(data)-8] = d[3]
+		data[len(data)-7] = d[4]
+		data[len(data)-6] = d[5]
+		data[len(data)-5] = d[6]
+		data[len(data)-4] = d[7]
+		data[len(data)-3] = d[8]
+		//log.Print(string(data))
+		//log.Print(data)
+		//time.Sleep(time.Second)
+		hashStr := hash.GetHash(data)
+		//log.Print(hashStr)
+		if hash.CheckHash(hashStr){
+			err2 := ioutil.WriteFile(dataDir+strconv.FormatInt(int64(fileidx), 10)+".json", data, 0644)
+			if err2 != nil{
+				log.Fatalf("%v", err2)
+			}
+			loglen = 0
+			fileidx++
+			curBlock.BlockID = fileidx
+			curBlock.PrevHash = hashStr
+			curBlock.Transactions = []*pb.Transaction{}
+			updateBlock = true
+		}
+		start++
+	}
+}
+
 func (s *server) Transfer(ctx context.Context, in *pb.Transaction) (*pb.BooleanResponse, error) {
 	// A new account will have balance 1000 instead of 0.
 	var init bool
@@ -114,30 +144,25 @@ func (s *server) Transfer(ctx context.Context, in *pb.Transaction) (*pb.BooleanR
 			loglen++
 			data[in.FromID] -= in.Value
 			data[in.ToID] += in.Value
-			data[file.MinerID] += in.MiningFee
+			data[curBlock.MinerID] += in.MiningFee
 			// Json I/O
-			entry := transactionio{"TRANSFER", in.FromID, in.ToID, in.Value, in.MiningFee, in.UUID}
-			file.Transactions = append(file.Transactions, entry)
-			data, err1 := json.Marshal(file)
-			if err1 != nil {
-				return &pb.BooleanResponse{Success: false}, err1
-			}
-			err2 := ioutil.WriteFile(dataDir+strconv.FormatInt(fileidx, 10)+".json", data, 0644)
-			if err2 != nil {
-				return &pb.BooleanResponse{Success: false}, err2
-			}
-			if loglen % maxBlockSize == 0 {
-				loglen = 0
-				fileidx++
-				file.BlockID = fileidx
-				file.Transactions = []transactionio{}
-			}
+
+			log.Printf("[%s] Transaction  %s -> %s (%d)", address, in.FromID, in.ToID, in.Value)
 			if in.Type == 5{  // TRANSFER
 				in.Type = 4
 				count, err := s.PushTransaction(ctx, in)
-				if err==nil && count.Number>=int32(1){
+				if err!=nil{
+					return &pb.BooleanResponse{Success: false}, err
+				}
+				if count.Number>=int32(1){
+					entry := pb.Transaction{Type: 5, FromID: in.FromID, ToID: in.ToID, Value: in.Value, MiningFee: in.MiningFee, UUID: in.UUID}
+					if loglen < maxBlockSize{
+						curBlock.Transactions = append(curBlock.Transactions, &entry)
+						updateBlock = true
+					}
 					return &pb.BooleanResponse{Success: true}, nil
 				}else{
+					log.Printf("Transaction unrecognized by other users")
 					return &pb.BooleanResponse{Success: false}, nil
 				}
 			}
@@ -165,7 +190,6 @@ func (s *server) PushBlock(ctx context.Context, in *pb.JsonBlockString) (*pb.Nul
 func (s *server) PushTransaction(ctx context.Context, in *pb.Transaction) (*pb.IntegerResponse, error) {
 	var count int32
 	for _, addr := range server_list{
-		log.Print(addr)
 		conn, err := grpc.Dial(addr, grpc.WithInsecure())
 		defer conn.Close()
 		if err == nil {
@@ -188,8 +212,8 @@ func main() {
 	MinerID := fmt.Sprintf("Server%02d",*id) //MinerID=
 	_=hash.GetHashString
 
-	file = fileio{fileidx, prevHash, []transactionio{}, MinerID,nonce}
-	
+	//file = fileio{fileidx, prevHash, []transactionio{}, MinerID,nonce}
+	curBlock = pb.Block{BlockID: fileidx, PrevHash: prevHash, Transactions: []*pb.Transaction{}, MinerID: MinerID, Nonce: nonce}
 
 	// Read config
 	address, dataDir = func() (string, string) {
@@ -209,15 +233,13 @@ func main() {
 				server_list = append(server_list, curAddr)
 			}
 		}
-		log.Print(server_list)
 		dat = dat[IDstr].(map[string]interface{}) // should be dat[myNum] in the future
 		return fmt.Sprintf("%s:%s", dat["ip"], dat["port"]), fmt.Sprintf("%s",dat["dataDir"])
 	}()
 	//Different from Project 3, when a server crashes, it loses all data on disk. The server should recover its blocks by replicating from another server.
 	os.RemoveAll(dataDir)
 	os.Mkdir(dataDir, 0777)
-	log.Print(address)
-	log.Print(dataDir)
+	log.Printf("Initialize %s %s Neighbors:%v", address, dataDir, server_list)
 
 	// Bind to port
 	lis, err := net.Listen("tcp", address)
@@ -232,8 +254,11 @@ func main() {
 	// Register reflection service on gRPC server.
 	reflection.Register(s)
 
+	go Mine()
+
 	// Start server
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}
+
 }
